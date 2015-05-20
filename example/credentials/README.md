@@ -1,13 +1,14 @@
 How to specify credentials in Haxl?
 -----------------------------------
 
-(Bottom up description)
-- Specify credentials at the bottom: 
+- Specify credentials at the `Request` constructors: 
 
-  ```
-  sql :: UserReq a -> IO a
-  ```
-  
+    ```
+    data UserReq a where  
+      GetFriendIds:: Id -> UserReq [Id] 
+      GetLocation :: Id -> UserReq Location 
+    ```
+
   What each `UserReq` requires to run?
   
     ```
@@ -22,11 +23,37 @@ How to specify credentials in Haxl?
       
   - Only `x`'s friends can see `x`'s location
       `A2: forall x y. isFriend x y => hasCredentials x (clocation y)`
-    
+ 
+- Where do I use the `UserReq`? 
+  - As arguments at the implementation of the `fetch`
+    In our example, in the `sql`, but the `sql` can have true preconditions.
+ 
+  - At the API: 
+    For example 
 
-# Vocabulary 
+    ```
+    getUserLocation :: Id -> Haxl Location
+    getUserLocation x = dataFetch $ GetLocation x
+    ```
+    
+    I want the API to have the same credentials as the `UserRequest`. 
+    Thus, `dataFetch` preserves the credentials:
+    
+    ```
+   dataFetch :: (DataSource u r, Request r a) => {req: r a} -> {haxl : GenHaxl u a | credential req = credential haxl}
+    ```
+    So, I get
+    
+    ```
+    getUserLocation  :: x:Id -> {haxl : Haxl Location | credential haxl = clocation x}
+    getFriendIdsById :: x:Id -> {haxl : Haxl [{v:Id | isFriend x v}] | credential haxl = cfriends x}
+    ```
+    
+  Note: the `isFriend x v` instide the result type is taken by polymorphism, as long as, type variable `a` in `dataFetch` is not comnstraint to be true by type classes... This needs some work.
+
+- Vocabulary 
   - `isFriend :: Id -> Id -> Prop`
-  - `credential :: UserReq a -> Credential`
+  - `credential :: UserReq a -> Credential` and `credential :: GenHaxl u a -> Credential`
   - `cfriends :: Id -> Credential`
   - `clocation :: Id -> Credential`
   - `hasCredentials :: Id -> Credential -> Prop`

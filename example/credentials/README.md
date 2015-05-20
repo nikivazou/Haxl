@@ -18,9 +18,17 @@ How to specify credentials in Haxl?
 
   **POLICIES as axioms**
   - Anyone can query the list of  `x`'s friends
-      ` forall y x. hasCredentials y (cfriends x)`
+      `A1: forall y x. hasCredentials y (cfriends x)`
       
   - Only `x`'s friends can see `x`'s location
-      `forall x y. isFriend x y => hasCredentials x (clocation y)`
+      `A2: forall x y. isFriend x y => hasCredentials x (clocation y)`
     
 
+# Vocabulary 
+  - `isFriend :: Id -> Id -> Prop`
+  - `credential :: UserReq a -> Credential`
+  - `cfriends :: Id -> Credential`
+  - `clocation :: Id -> Credential`
+  - `hasCredentials :: Id -> Credential -> Prop`
+  
+  Then, Axioms `A1, A2`

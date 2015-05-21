@@ -55,13 +55,36 @@ How to specify credentials in Haxl?
  
    ```
    getHerFiendsLocations :: Id -> Haxl [(Id, Location)]
-   getHerFiendsLocations id = do 
-     userIds <- getFriendIdsById id -- userIds :: [{v:Id | isFriend id v }] 
-     locs    <- for userIds getUserLocation
+   getHerFiendsLocations x = do 
+     userIds <- getFriendIdsById x           // {haxl  : Haxl [{v:Id | isFriend x v}] | credential haxl = cfriends x}
+     locs    <- for userIds getUserLocation  // {haxl' : Haxl [Loc] | credential haxl = }
      return $ zip userIds locs  
    ```
 
+  For the above typechecking we require the "connectives" to have appropriate types:
+  
+  
+  - Type for `for`:  we can just use unification
 
+  ```
+    for  :: forall p :: m b -> Prop 
+           [a] -> (y:a -> m <p> b) -> m <p> [b]
+  ```
+  
+  Instantiate `p` with `hasCredentials x` to get a good type
+
+  ```
+    for  :: [a] 
+        -> (y:a -> {haxl: m b | hasCredentials x haxl}) // nice all ys are friends of x 
+        -> {haxl:m [b]| hasCredentials x haxl}
+  ```
+  
+  Alternatively, and more precicely, we can have the result return the _lub_ of the credentials, 
+  but it is not clear how to express that.
+  
+  To use that we just need an abstract refinement 
+
+  - ` >>= k:m a -> (x:a -> m b) -> m b`
 
 - Vocabulary 
   - `isFriend :: Id -> Id -> Prop`

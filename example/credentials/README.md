@@ -54,10 +54,9 @@ How to specify credentials in Haxl?
 - Using the API:
  
    ```
-   getHerFiendsLocations :: Id -> Haxl [(Id, Location)]
    getHerFiendsLocations x = do 
-     userIds <- getFriendIdsById x           // {haxl  : Haxl [{v:Id | isFriend x v}] | credential haxl = cfriends x}
-     locs    <- for userIds getUserLocation  // {haxl' : Haxl [Loc] | credential haxl = }
+     userIds <- getFriendIdsById x           // {haxl : Haxl [{v:Id | isFriend x v}] | credential haxl = cfriends x}
+     locs    <- for userIds getUserLocation  // {haxl : Haxl [Loc] | hasCredentials x haxl}
      return $ zip userIds locs  
    ```
 
@@ -84,8 +83,26 @@ How to specify credentials in Haxl?
   
   To use that we just need an abstract refinement 
 
-  - ` >>= k:m a -> (x:a -> m b) -> m b`
+  - Type of bind: As above it would be wonderful to use _lup_ and be precise, but we can again use unification 
+    
+    ```
+    >>= :: forall <p :: m a -> Prop>. m <p> a -> (a -> m <p> b) -> m <p> b
+    ```
+    And instantiate again `p` with `hasCredentials x`, since `credential haxl = cfriends x => hasCredentials x haxl`. 
 
+  - Type of return: Return should safisfy any predicate 
+
+    ```
+     return  :: forall <p :: m a -> Prop>. a -> m <p> a
+    ```
+
+  With the above we have the type 
+  
+  ```
+    getHerFiendsLocations :: x:Id -> {haxl : Haxl [(Id, Location)] | hasCredentials x haxl}
+  ```
+  
+  
 - Vocabulary 
   - `isFriend :: Id -> Id -> Prop`
   - `credential :: UserReq a -> Credential` and `credential :: GenHaxl u a -> Credential`

@@ -67,7 +67,7 @@ How to specify credentials in Haxl?
   - Type for `for`:  we can just use unification
 
   ```
-    for  :: forall p :: m b -> Prop 
+    for  :: forall p :: m b -> Prop.
            [a] -> (y:a -> m <p> b) -> m <p> [b]
   ```
   

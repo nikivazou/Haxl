@@ -76,7 +76,7 @@ How to specify credentials in Haxl?
 
   ```
     for  :: [a] 
-        -> (y:a -> {haxl: m b | hasCredentials x haxl}) // nice all ys are friends of x 
+        -> (y:a -> {haxl: m b | hasCredentials x haxl}) // since all ys are friends of x 
         -> {haxl:m [b]| hasCredentials x haxl}
   ```
   

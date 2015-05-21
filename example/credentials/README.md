@@ -51,6 +51,18 @@ How to specify credentials in Haxl?
     
   Note: the `isFriend x v` instide the result type is taken by polymorphism, as long as, type variable `a` in `dataFetch` is not comnstraint to be true by type classes... This needs some work.
 
+- Using the API:
+ 
+   ```
+   getHerFiendsLocations :: Id -> Haxl [(Id, Location)]
+   getHerFiendsLocations id = do 
+     userIds <- getFriendIdsById id -- userIds :: [{v:Id | isFriend id v }] 
+     locs    <- for userIds getUserLocation
+     return $ zip userIds locs  
+   ```
+
+
+
 - Vocabulary 
   - `isFriend :: Id -> Id -> Prop`
   - `credential :: UserReq a -> Credential` and `credential :: GenHaxl u a -> Credential`

@@ -1,3 +1,5 @@
+- TODO: check exaclty where I use the axioms
+
 How to specify credentials in Haxl?
 -----------------------------------
 
@@ -102,6 +104,16 @@ How to specify credentials in Haxl?
     getHerFiendsLocations :: x:Id -> {haxl : Haxl [(Id, Location)] | hasCredentials x haxl}
   ```
   
+  - Finally by giving the appropriate type to `runHaxl` we can verify that all the datafetches have the appropriate credentials
+  
+  ```
+  runHaxl :: env:Env u -> {haxl:GenHaxl u a | hasCredentials (idOfEnv env) haxl} -> IO a
+  ```
+  
+  We can verify that for _any_ ids `x` and `y` and any environment `env` 
+  so that `idOfEnv env == x`,
+  `runHaxl env (getHetFirendsLications x)` is SAFE, but 
+  `runHaxl env (getHetFirendsLications y)` is UNSAFE. 
   
 - Vocabulary 
   - `isFriend :: Id -> Id -> Prop`
@@ -109,5 +121,6 @@ How to specify credentials in Haxl?
   - `cfriends :: Id -> Credential`
   - `clocation :: Id -> Credential`
   - `hasCredentials :: Id -> Credential -> Prop`
+  - `idOfEnv :: Env u -> Id`
   
   Then, Axioms `A1, A2`
